@@ -26,47 +26,53 @@ class ListLexer:
 
     def __init__(self, input_: str):
         self._input = input_
-        self._current = None
+        self._current_char = None
         self._cursor = -1
 
     def next_token(self) -> Optional[Token]:
-        while self._current != self.EOF:
-            if self._current is None:
-                # first next_token
+        while self._current_char != self.EOF:
+            if self._current_char is None:
+                # for first next_token call
                 self._consume()
-            elif self._current in [' ']:
-                # white space
-                # TODO: deal with all whitespace case
-                self._consume()
-            elif self._current == ',':
+            elif self._is_whitespace():
+                self._whitespace()
+            elif self._current_char == ',':
                 self._consume()
                 return Token(TokenType.COMMA, ',')
-            elif self._current == '[':
+            elif self._current_char == '[':
                 self._consume()
                 return Token(TokenType.LBRACK, '[')
-            elif self._current == ']':
+            elif self._current_char == ']':
                 self._consume()
                 return Token(TokenType.RBRACK, ']')
             elif self._is_letter():
                 return self._var_token()
             else:
-                raise ListLexerNextTokenException(f'invalid character: {self._current}')
+                raise ListLexerNextTokenException(f'invalid character: {self._current_char}')
         return None
 
     def _consume(self):
         self._cursor += 1
         if self._cursor >= len(self._input):
-            self._current = self.EOF
+            self._current_char = self.EOF
         else:
-            self._current = self._input[self._cursor]
+            self._current_char = self._input[self._cursor]
 
     def _is_letter(self) -> bool:
-        # only alphabet is acceptable
-        return re.match('^[a-zA-Z]$', self._current) is not None
+        # if current character is letter a-z, A-Z -> True
+        return re.match(r'^[a-zA-Z]$', self._current_char) is not None
+
+    def _is_whitespace(self) -> bool:
+        # if current character is white space -> True
+        return re.match(r'^\s$', self._current_char) is not None
 
     def _var_token(self) -> Token:
         variable_letters = []
         while self._is_letter():
-            variable_letters.append(self._current)
+            variable_letters.append(self._current_char)
             self._consume()
         return Token(TokenType.VAR, ''.join(variable_letters))
+
+    def _whitespace(self):
+        while self._is_whitespace():
+            self._consume()
