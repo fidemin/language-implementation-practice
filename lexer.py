@@ -5,15 +5,16 @@ from typing import Optional
 
 
 class TokenType(Enum):
-    VAR = 2
-    COMMA = 3
-    LBRACK = 4
-    RBRACK = 5
+    EOF = -1
+    VAR = 1
+    COMMA = 2
+    LBRACK = 3
+    RBRACK = 4
 
 
 @dataclass
 class Token:
-    token_type: TokenType
+    type: TokenType
     text: str
 
 
@@ -29,7 +30,7 @@ class ListLexer:
         self._current_char = None
         self._cursor = -1
 
-    def next_token(self) -> Optional[Token]:
+    def next_token(self) -> Token:
         while self._current_char != self.EOF:
             if self._current_char is None:
                 # for first next_token call
@@ -49,7 +50,7 @@ class ListLexer:
                 return self._var_token()
             else:
                 raise ListLexerNextTokenException(f'invalid character: {self._current_char}')
-        return None
+        return Token(TokenType.EOF, '')
 
     def _consume(self):
         self._cursor += 1

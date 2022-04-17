@@ -16,7 +16,7 @@ class TestLexer:
             Token(TokenType.RBRACK, ']')
         ]
         results = []
-        while (token := lexer.next_token()) is not None:
+        while (token := lexer.next_token()).type != TokenType.EOF:
             results.append(token)
 
         assert results == expected
