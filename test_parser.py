@@ -11,6 +11,8 @@ class TestListParser:
             ('[]',),
             ('[a]',),
             ('[a, b, c]',),
+            ('[a, [b, c, d], [e]]',),
+            ('[a, [], []]',),
         ]
 
     @staticmethod
@@ -19,6 +21,7 @@ class TestListParser:
             ('[',),
             (']',),
             ('[a, b, c,]',),
+            ('[a, [, c]',),
             ('[a, b, c][',),
         ]
 

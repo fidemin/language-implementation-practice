@@ -22,13 +22,16 @@ class ListParser:
         self._match(TokenType.RBRACK)
 
     def _elements(self):
-        self._match(TokenType.VAR)
+        self._element()
         while self._lookahead.type == TokenType.COMMA:
             self._match(TokenType.COMMA)
-            self._match(TokenType.VAR)
+            self._element()
 
     def _element(self):
-        self._match(TokenType.VAR)
+        if self._lookahead.type == TokenType.VAR:
+            self._match(TokenType.VAR)
+        else:
+            self._list()
 
     def _match(self, token_type: TokenType):
         if self._lookahead.type == token_type:
