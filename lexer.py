@@ -10,6 +10,7 @@ class TokenType(Enum):
     COMMA = 2
     LBRACK = 3
     RBRACK = 4
+    EQUAL = 5
 
 
 @dataclass
@@ -46,6 +47,9 @@ class ListLexer:
             elif self._current_char == ']':
                 self._consume()
                 return Token(TokenType.RBRACK, ']')
+            elif self._current_char == '=':
+                self._consume()
+                return Token(TokenType.EQUAL, '=')
             elif self._is_letter():
                 return self._var_token()
             else:
