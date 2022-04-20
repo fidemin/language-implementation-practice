@@ -56,5 +56,5 @@ class ListParser:
         self._lookahead_buffer[self._p] = self._lexer.next_token()
         self._p = (self._p + 1) % self._k
 
-    def _lookahead_token(self, i: int):
+    def _lookahead_token(self, i: int) -> Token:
         return self._lookahead_buffer[(self._p + i) % self._k]
