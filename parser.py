@@ -7,6 +7,8 @@ class ListParserException(Exception):
 
 class ListParser:
     def __init__(self, lexer: ListLexer, k: int):
+        if k <= 1:
+            raise ListParserException("k value should be larger than 1")
         self._lexer = lexer
         self._k = k
         self._lookahead_buffer = [Token(TokenType.EOF, '')] * self._k
@@ -34,7 +36,12 @@ class ListParser:
             self._element()
 
     def _element(self):
-        if self._lookahead_token(0).type == TokenType.VAR:
+        if self._lookahead_token(0).type == TokenType.VAR and self._lookahead_token(1).type == TokenType.EQUAL:
+            # VAR=VAR case e.g. a=b
+            self._match(TokenType.VAR)
+            self._match(TokenType.EQUAL)
+            self._match(TokenType.VAR)
+        elif self._lookahead_token(0).type == TokenType.VAR:
             self._match(TokenType.VAR)
         else:
             self._list()
