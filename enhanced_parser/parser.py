@@ -1,5 +1,7 @@
 from core.lexer import TokenType, Token, ListLexer
 
+from collections import defaultdict
+
 
 class ParserException(Exception):
     pass
@@ -17,9 +19,22 @@ class Parser:
     def __init__(self, lexer: ListLexer):
         self._lexer = lexer
         self._lookahead_buffer = []
+
+        # speculating status
         self._is_speculating = False
+
+        # accumulative position
+        self._retrieved_buffer_size = 0
+
+        # current position to buffer
         self._p = -1
+
+        # saved position when marked
         self._saved_p = -1
+
+        # cache for parsed token index
+        self._parsed_cache = defaultdict(dict)
+
         self._consume()
 
     def parse(self):
@@ -87,12 +102,20 @@ class Parser:
         list: '[' elements ']'
         :return:
         """
+        start_accumulative_p = self._accumulative_p()
+        if (start_end_p_tuple := self._parsed_cache['_list'].get(start_accumulative_p)) is not None:
+            self._p = start_end_p_tuple[1]
+            return
+
+        start_p = self._p
         self._match(TokenType.LBRACK)
         if self._lookahead_token(0).type == TokenType.RBRACK:
             self._match(TokenType.RBRACK)
             return
         self._elements()
         self._match(TokenType.RBRACK)
+        end_p = self._p
+        self._parsed_cache['_list'][start_accumulative_p] = (start_p, end_p)
 
     def _elements(self):
         """
@@ -132,9 +155,13 @@ class Parser:
     def _consume(self):
         self._p += 1
         if self._p == len(self._lookahead_buffer) and not self._is_speculating:
+            self._retrieved_buffer_size += self._retrieved_buffer_size + len(self._lookahead_buffer)
             self._p = 0
             self._lookahead_buffer = []
         self._sync(1)
+
+    def _accumulative_p(self):
+        return self._retrieved_buffer_size + self._p
 
     def _sync(self, i: int):
         if self._p + i - 1 > len(self._lookahead_buffer) - 1:
