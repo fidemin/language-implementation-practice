@@ -5,7 +5,11 @@ class ParserException(Exception):
     pass
 
 
-class MatchFailException(ParserException):
+class MisMatchException(ParserException):
+    pass
+
+
+class SpeculationException(ParserException):
     pass
 
 
@@ -13,57 +17,70 @@ class Parser:
     def __init__(self, lexer: ListLexer):
         self._lexer = lexer
         self._lookahead_buffer = []
+        self._is_speculating = False
         self._p = -1
+        self._saved_p = -1
         self._consume()
 
     def parse(self):
-        self._list()
+        self._stat()
         self._match(TokenType.EOF)
 
-    #def _stat(self):
-    #    """
-    #    stat: list EOF | assign EOF;
-    #    :return:
-    #    """
-    #    if self._speculate_list():
-    #        self._list()
-    #        self._match(TokenType.EOF)
-    #    elif self._speculate_assign():
-    #        self._assign()
-    #        self._match(TokenType.EOF)
+    def _stat(self):
+        """
+        stat: list EOF | assign EOF;
+        :return:
+        """
+        if self._speculate_list():
+            self._list()
+            self._match(TokenType.EOF)
+        elif self._speculate_assign():
+            self._assign()
+            self._match(TokenType.EOF)
+        else:
+            raise SpeculationException(f'expecting stat but found {self._lookahead_token(0)}')
 
-    #def _speculate_list(self) -> bool:
-    #    success = True
-    #    self._mark()
-    #    try:
-    #        self._list()
-    #        self._match(TokenType.EOF)
-    #    except MatchFailException:
-    #        success = False
-    #    finally:
-    #        self._release()
-    #    return success
+    def _speculate_list(self) -> bool:
+        success = True
+        self._mark()
+        try:
+            self._list()
+            self._match(TokenType.EOF)
+        except MisMatchException:
+            success = False
+        finally:
+            self._release()
+        return success
 
-    #def _speculate_assign(self) -> bool:
-    #    success = True
-    #    self._mark()
-    #    try:
-    #        self._assign()
-    #        self._match(TokenType.EOF)
-    #    except MatchFailException:
-    #        success = False
-    #    finally:
-    #        self._release()
-    #    return success
+    def _speculate_assign(self) -> bool:
+        success = True
+        self._mark()
+        try:
+            self._assign()
+            self._match(TokenType.EOF)
+        except MisMatchException:
+            success = False
+        finally:
+            self._release()
+        return success
 
-    #def _assign(self):
-    #    """
-    #    assign: List '=' List;
-    #    :return:
-    #    """
-    #    self._list()
-    #    self._match(TokenType.EQUAL)
-    #    self._list()
+    def _mark(self):
+        self._is_speculating = True
+        self._saved_p = self._p
+
+    def _release(self):
+        self._p = self._saved_p
+        self._saved_p = -1
+        self._is_speculating = False
+
+    def _assign(self):
+        """
+        assign: List '=' List;
+        :return:
+        """
+        self._list()
+        self._match(TokenType.EQUAL)
+        self._list()
 
     def _list(self):
         """
@@ -106,7 +123,7 @@ class Parser:
         if self._lookahead_token(0).type == token_type:
             self._consume()
         else:
-            raise MatchFailException(f'expecting {token_type}; found {self._lookahead_token(0).type}')
+            raise MisMatchException(f'expecting {token_type}; found {self._lookahead_token(0).type}')
 
     def _lookahead_token(self, i: int) -> Token:
         self._sync(i+1)
@@ -114,14 +131,10 @@ class Parser:
 
     def _consume(self):
         self._p += 1
-        if self._p == len(self._lookahead_buffer) and not self._is_speculating():
+        if self._p == len(self._lookahead_buffer) and not self._is_speculating:
             self._p = 0
             self._lookahead_buffer = []
         self._sync(1)
-        print("\nLOOKAHEAD: ", self._lookahead_buffer)
-
-    def _is_speculating(self):
-        return False
 
     def _sync(self, i: int):
         if self._p + i - 1 > len(self._lookahead_buffer) - 1:

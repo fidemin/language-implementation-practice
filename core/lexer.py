@@ -63,10 +63,14 @@ class ListLexer:
             self._current_char = self._input[self._cursor]
 
     def _is_letter(self) -> bool:
+        if self._current_char == self.EOF:
+            return False
         # if current character is letter a-z, A-Z -> True
         return re.match(r'^[a-zA-Z]$', self._current_char) is not None
 
     def _is_whitespace(self) -> bool:
+        if self._current_char == self.EOF:
+            return False
         # if current character is white space -> True
         return re.match(r'^\s$', self._current_char) is not None
 
