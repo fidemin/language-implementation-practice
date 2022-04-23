@@ -1,6 +1,6 @@
 import pytest
 
-from .lexer import ListLexer
+from core.lexer import ListLexer
 from .parser import ListParser, ListParserException
 
 

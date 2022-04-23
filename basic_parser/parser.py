@@ -1,4 +1,4 @@
-from .lexer import TokenType, Token, ListLexer
+from core.lexer import TokenType, Token, ListLexer
 
 
 class ListParserException(Exception):

@@ -1,4 +1,4 @@
-from .lexer import Token, TokenType, ListLexer
+from core.lexer import Token, TokenType, ListLexer
 
 
 class TestLexer:
