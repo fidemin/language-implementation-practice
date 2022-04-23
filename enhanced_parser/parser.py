@@ -102,20 +102,21 @@ class Parser:
         list: '[' elements ']'
         :return:
         """
+        cache_key = '_list'
+
         start_accumulative_p = self._accumulative_p()
-        if (start_end_p_tuple := self._parsed_cache['_list'].get(start_accumulative_p)) is not None:
+        if (start_end_p_tuple := self._parsed_cache[cache_key].get(start_accumulative_p)) is not None:
             self._p = start_end_p_tuple[1]
             return
 
         start_p = self._p
         self._match(TokenType.LBRACK)
-        if self._lookahead_token(0).type == TokenType.RBRACK:
-            self._match(TokenType.RBRACK)
-            return
-        self._elements()
+        if self._lookahead_token(0).type != TokenType.RBRACK:
+            self._elements()
         self._match(TokenType.RBRACK)
         end_p = self._p
-        self._parsed_cache['_list'][start_accumulative_p] = (start_p, end_p)
+
+        self._parsed_cache[cache_key][start_accumulative_p] = (start_p, end_p)
 
     def _elements(self):
         """
@@ -156,6 +157,16 @@ class Parser:
         self._p += 1
         if self._p == len(self._lookahead_buffer) and not self._is_speculating:
             self._retrieved_buffer_size += self._retrieved_buffer_size + len(self._lookahead_buffer)
+            # remove old caches
+            for cache_method_key in self._parsed_cache.keys():
+                cache_for_method = self._parsed_cache[cache_method_key]
+                delete_keys = []
+                for cached_acc_p in cache_for_method.keys():
+                    if cached_acc_p < self._retrieved_buffer_size:
+                        delete_keys.append(cached_acc_p)
+                for key in delete_keys:
+                    cache_for_method.pop(key)
+
             self._p = 0
             self._lookahead_buffer = []
         self._sync(1)
