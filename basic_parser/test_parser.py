@@ -1,7 +1,7 @@
 import pytest
 
-from lexer import ListLexer
-from parser import ListParser, ListParserException
+from .lexer import ListLexer
+from .parser import ListParser, ListParserException
 
 
 class TestListParser:
