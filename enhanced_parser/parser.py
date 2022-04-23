@@ -15,25 +15,28 @@ class SpeculationException(ParserException):
     pass
 
 
+def save_and_restore_p(method):
+    def inner(self, *args, **kwargs):
+        self._save_p()
+        returned = method(self, *args, **kwargs)
+        self._restore_p()
+        return returned
+    return inner
+
+
 class Parser:
     def __init__(self, lexer: ListLexer):
         self._lexer = lexer
         self._lookahead_buffer = []
 
-        # speculating status
-        self._is_speculating = False
-
-        # accumulative position
+        self._lock_buffer_reset = False
         self._retrieved_buffer_size = 0
 
-        # current position to buffer
         self._p = -1
-
-        # saved position when marked
         self._saved_p = -1
 
-        # cache for parsed token index
-        self._parsed_cache = defaultdict(dict)
+        # caches for already parsed rule
+        self._parsed_caches = defaultdict(dict)
 
         self._consume()
 
@@ -55,38 +58,34 @@ class Parser:
         else:
             raise SpeculationException(f'expecting stat but found {self._lookahead_token(0)}')
 
+    @save_and_restore_p
     def _speculate_list(self) -> bool:
         success = True
-        self._mark()
         try:
             self._list()
             self._match(TokenType.EOF)
         except MisMatchException:
             success = False
-        finally:
-            self._release()
         return success
 
+    @save_and_restore_p
     def _speculate_assign(self) -> bool:
         success = True
-        self._mark()
         try:
             self._assign()
             self._match(TokenType.EOF)
         except MisMatchException:
             success = False
-        finally:
-            self._release()
         return success
 
-    def _mark(self):
-        self._is_speculating = True
+    def _save_p(self):
+        self._lock_buffer_reset = True
         self._saved_p = self._p
 
-    def _release(self):
+    def _restore_p(self):
         self._p = self._saved_p
         self._saved_p = -1
-        self._is_speculating = False
+        self._lock_buffer_reset = False
 
     def _assign(self):
         """
@@ -105,7 +104,7 @@ class Parser:
         cache_key = '_list'
 
         start_accumulative_p = self._accumulative_p()
-        if (start_end_p_tuple := self._parsed_cache[cache_key].get(start_accumulative_p)) is not None:
+        if (start_end_p_tuple := self._parsed_caches[cache_key].get(start_accumulative_p)) is not None:
             self._p = start_end_p_tuple[1]
             return
 
@@ -116,7 +115,7 @@ class Parser:
         self._match(TokenType.RBRACK)
         end_p = self._p
 
-        self._parsed_cache[cache_key][start_accumulative_p] = (start_p, end_p)
+        self._parsed_caches[cache_key][start_accumulative_p] = (start_p, end_p)
 
     def _elements(self):
         """
@@ -155,21 +154,25 @@ class Parser:
 
     def _consume(self):
         self._p += 1
-        if self._p == len(self._lookahead_buffer) and not self._is_speculating:
-            self._retrieved_buffer_size += self._retrieved_buffer_size + len(self._lookahead_buffer)
-            # remove old caches
-            for cache_method_key in self._parsed_cache.keys():
-                cache_for_method = self._parsed_cache[cache_method_key]
-                delete_keys = []
-                for cached_acc_p in cache_for_method.keys():
-                    if cached_acc_p < self._retrieved_buffer_size:
-                        delete_keys.append(cached_acc_p)
-                for key in delete_keys:
-                    cache_for_method.pop(key)
-
-            self._p = 0
-            self._lookahead_buffer = []
+        if self._p == len(self._lookahead_buffer) and not self._lock_buffer_reset:
+            self._reset_buffer()
+            self._remove_old_caches()
         self._sync(1)
+
+    def _reset_buffer(self):
+        self._retrieved_buffer_size += self._retrieved_buffer_size + len(self._lookahead_buffer)
+        self._p = 0
+        self._lookahead_buffer = []
+
+    def _remove_old_caches(self):
+        for cache_method_key in self._parsed_caches.keys():
+            cache_for_method = self._parsed_caches[cache_method_key]
+            delete_keys = []
+            for cached_acc_p in cache_for_method.keys():
+                if cached_acc_p < self._retrieved_buffer_size:
+                    delete_keys.append(cached_acc_p)
+            for key in delete_keys:
+                cache_for_method.pop(key)
 
     def _accumulative_p(self):
         return self._retrieved_buffer_size + self._p

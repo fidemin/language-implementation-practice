@@ -8,14 +8,14 @@ class TestListParser:
     @staticmethod
     def _parse_success_test_cases() -> list[str]:
         return [
-           # '[]',
-           # '[a]',
-           # '[a, b, c]',
-           # '[a, b, c=d]',
-           # '[a, [b, c, d=e], [f=g]]',
-           # '[a, [], []]',
+            '[]',
+            '[a]',
+            '[a, b, c]',
+            '[a, b, c=d]',
+            '[a, [b, c, d=e], [f=g]]',
+            '[a, [], []]',
             '[a, b]=[c, d]',
-           #'[a, b]=[[c], [de=f]]',
+            '[a, b]=[[c], [de=f]]',
         ]
 
     @staticmethod
