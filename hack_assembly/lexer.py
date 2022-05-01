@@ -8,6 +8,8 @@ class TokenType(Enum):
     AT = 1  # @ token
     INT = 2  # integer
     VAR = 3  # variable
+    REG = 4  # register
+    REG_DEST = 5  # register destination only
 
 
 @dataclass
@@ -95,5 +97,12 @@ class Lexer:
         while self._is_letter() or self._is_int():
             chars.append(self._current_char)
             self._consume()
+
+        var_text = ''.join(chars)
+
+        if var_text in ['M', 'D', 'A']:
+            return Token(TokenType.REG, var_text)
+        elif var_text in ['MD', 'AM', 'AD', 'AMD']:
+            return Token(TokenType.REG_DEST, var_text)
 
         return Token(TokenType.VAR, ''.join(chars))

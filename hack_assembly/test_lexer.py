@@ -25,6 +25,11 @@ class TestLexer:
                 Token(TokenType.AT, '@'),
                 Token(TokenType.INT, '123'),
             ]),
+            ('@M MD', [
+                Token(TokenType.AT, '@'),
+                Token(TokenType.REG, 'M'),
+                Token(TokenType.REG_DEST, 'MD'),
+            ]),
         ]
 
     @staticmethod
