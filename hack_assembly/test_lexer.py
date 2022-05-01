@@ -25,9 +25,10 @@ class TestLexer:
                 Token(TokenType.AT, '@'),
                 Token(TokenType.INT, '123'),
             ]),
-            ('MD=A', [
+            ('MD=-A', [
                 Token(TokenType.REG2, 'MD'),
                 Token(TokenType.EQUAL, '='),
+                Token(TokenType.MINUS, '-'),
                 Token(TokenType.REG1, 'A'),
             ]),
         ]
