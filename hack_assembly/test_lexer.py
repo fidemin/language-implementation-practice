@@ -45,6 +45,14 @@ class TestLexer:
                 Token(TokenType.REG_ONE, 'A'),
                 Token(TokenType.SEMICOLON, ';'),
             ]),
+            ('0;JMP D;JGT', [
+                Token(TokenType.INT, '0'),
+                Token(TokenType.SEMICOLON, ';'),
+                Token(TokenType.JUMP, 'JMP'),
+                Token(TokenType.REG_ONE, 'D'),
+                Token(TokenType.SEMICOLON, ';'),
+                Token(TokenType.JUMP, 'JGT'),
+            ]),
         ]
 
     @staticmethod

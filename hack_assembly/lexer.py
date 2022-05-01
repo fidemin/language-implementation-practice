@@ -4,20 +4,26 @@ from enum import Enum
 
 
 class TokenType(Enum):
+    # EOF
     EOF = -1
+
+    # main
     AT = 1  # @ token
     INT = 2  # integer
     VAR = 3  # variable
     REG_ONE = 4  # one register
     REG_MULTI = 5  # multiple registers
+    JUMP = 6  # jump symbol
 
-    EQUAL = 5
-    MINUS = 6
-    PLUS = 7
-    NOT = 8
-    AND = 9
-    OR = 10
-    SEMICOLON = 11
+    # operators
+    EQUAL = 20
+    MINUS = 21
+    PLUS = 22
+    NOT = 23
+    AND = 24
+    OR = 25
+    SEMICOLON = 26
+
 
 @dataclass
 class Token:
@@ -132,5 +138,7 @@ class Lexer:
             return Token(TokenType.REG_ONE, var_text)
         elif var_text in ['MD', 'AM', 'AD', 'AMD']:
             return Token(TokenType.REG_MULTI, var_text)
+        elif var_text in ['JGT', 'JEQ', 'JGE', 'JLT', 'JNE', 'JLE', 'JMP']:
+            return Token(TokenType.JUMP, var_text)
 
         return Token(TokenType.VAR, ''.join(chars))
