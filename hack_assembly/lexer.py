@@ -17,6 +17,7 @@ class TokenType(Enum):
     NOT = 8
     AND = 9
     OR = 10
+    SEMICOLON = 11
 
 @dataclass
 class Token:
@@ -60,6 +61,9 @@ class Lexer:
             elif self._current_char == '|':
                 self._consume()
                 return Token(TokenType.OR, '|')
+            elif self._current_char == ';':
+                self._consume()
+                return Token(TokenType.SEMICOLON, ';')
             elif self._is_whitespace():
                 self._whitespace()
             elif self._is_int():

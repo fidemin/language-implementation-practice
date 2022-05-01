@@ -35,7 +35,7 @@ class TestLexer:
                 Token(TokenType.NOT, '!'),
                 Token(TokenType.REG_ONE, 'M'),
             ]),
-            ('AMD=D&123 | A', [
+            ('AMD=D&123 | A;', [
                 Token(TokenType.REG_MULTI, 'AMD'),
                 Token(TokenType.EQUAL, '='),
                 Token(TokenType.REG_ONE, 'D'),
@@ -43,6 +43,7 @@ class TestLexer:
                 Token(TokenType.INT, '123'),
                 Token(TokenType.OR, '|'),
                 Token(TokenType.REG_ONE, 'A'),
+                Token(TokenType.SEMICOLON, ';'),
             ]),
         ]
 
