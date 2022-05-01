@@ -13,6 +13,7 @@ class TokenType(Enum):
 
     EQUAL = 5
     MINUS = 6
+    PLUS = 7
 
 @dataclass
 class Token:
@@ -38,12 +39,15 @@ class Lexer:
             if self._current_char == '@':
                 self._consume()
                 return Token(TokenType.AT, '@')
-            if self._current_char == '=':
+            elif self._current_char == '=':
                 self._consume()
                 return Token(TokenType.EQUAL, '=')
-            if self._current_char == '-':
+            elif self._current_char == '-':
                 self._consume()
                 return Token(TokenType.MINUS, '-')
+            elif self._current_char == '+':
+                self._consume()
+                return Token(TokenType.PLUS, '+')
             elif self._is_whitespace():
                 self._whitespace()
             elif self._is_int():
