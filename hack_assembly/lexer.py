@@ -88,9 +88,7 @@ class Lexer:
         return re.match(r'^[a-zA-Z]$', self._current_char) is not None
 
     def _var_token(self):
-        chars = []
-
-        # first letter should be letter
+        # first character should be letter
         chars = [self._current_char]
         self._consume()
 
