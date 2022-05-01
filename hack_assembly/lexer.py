@@ -8,13 +8,15 @@ class TokenType(Enum):
     AT = 1  # @ token
     INT = 2  # integer
     VAR = 3  # variable
-    REG1 = 4  # one register
-    REG2 = 5  # two registers
+    REG_ONE = 4  # one register
+    REG_MULTI = 5  # multiple registers
 
     EQUAL = 5
     MINUS = 6
     PLUS = 7
     NOT = 8
+    AND = 9
+    OR = 10
 
 @dataclass
 class Token:
@@ -52,6 +54,12 @@ class Lexer:
             elif self._current_char == '!':
                 self._consume()
                 return Token(TokenType.NOT, '!')
+            elif self._current_char == '&':
+                self._consume()
+                return Token(TokenType.AND, '&')
+            elif self._current_char == '|':
+                self._consume()
+                return Token(TokenType.OR, '|')
             elif self._is_whitespace():
                 self._whitespace()
             elif self._is_int():
@@ -117,8 +125,8 @@ class Lexer:
         var_text = ''.join(chars)
 
         if var_text in ['M', 'D', 'A']:
-            return Token(TokenType.REG1, var_text)
+            return Token(TokenType.REG_ONE, var_text)
         elif var_text in ['MD', 'AM', 'AD', 'AMD']:
-            return Token(TokenType.REG2, var_text)
+            return Token(TokenType.REG_MULTI, var_text)
 
         return Token(TokenType.VAR, ''.join(chars))
