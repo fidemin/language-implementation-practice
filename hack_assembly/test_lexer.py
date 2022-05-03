@@ -53,6 +53,13 @@ class TestLexer:
                 Token(TokenType.SEMICOLON, ';'),
                 Token(TokenType.JUMP, 'JGT'),
             ]),
+            ('D=R0+SP', [
+                Token(TokenType.REG_ONE, 'D'),
+                Token(TokenType.EQUAL, '='),
+                Token(TokenType.PREDEFINED, 'R0'),
+                Token(TokenType.PLUS, '+'),
+                Token(TokenType.PREDEFINED, 'SP'),
+            ]),
         ]
 
     @staticmethod

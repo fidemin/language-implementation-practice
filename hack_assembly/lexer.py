@@ -14,6 +14,7 @@ class TokenType(Enum):
     REG_ONE = 4  # one register
     REG_MULTI = 5  # multiple registers
     JUMP = 6  # jump symbol
+    PREDEFINED = 7  # predefined symbol
 
     # operators
     EQUAL = 20
@@ -140,5 +141,7 @@ class Lexer:
             return Token(TokenType.REG_MULTI, var_text)
         elif var_text in ['JGT', 'JEQ', 'JGE', 'JLT', 'JNE', 'JLE', 'JMP']:
             return Token(TokenType.JUMP, var_text)
-
+        elif (var_text in ['SP', 'LCL', 'ARG', 'THIS', 'THAT', 'SCREEN', 'KBD'] or
+                re.match(r'^R([01][0-5]|\d)$', var_text) is not None):
+            return Token(TokenType.PREDEFINED, var_text)
         return Token(TokenType.VAR, ''.join(chars))
