@@ -65,6 +65,18 @@ class TestLexer:
                 Token(TokenType.VAR, 'LOOP'),
                 Token(TokenType.RPAREN, ')'),
             ]),
+            ('''(LOOP)
+            D=R0+1''', [
+                Token(TokenType.LPAREN, '('),
+                Token(TokenType.VAR, 'LOOP'),
+                Token(TokenType.RPAREN, ')'),
+                Token(TokenType.NEWLINE, ''),
+                Token(TokenType.REG_ONE, 'D'),
+                Token(TokenType.EQUAL, '='),
+                Token(TokenType.PREDEFINED, 'R0'),
+                Token(TokenType.PLUS, '+'),
+                Token(TokenType.INT, '1'),
+            ]),
         ]
 
     @staticmethod

@@ -28,6 +28,7 @@ class TokenType(Enum):
     SEMICOLON = 30
     LPAREN = 31
     RPAREN = 32
+    NEWLINE = 33
 
 
 @dataclass
@@ -83,6 +84,8 @@ class Lexer:
                 return Token(TokenType.RPAREN, ')')
             elif self._is_whitespace():
                 self._whitespace()
+            elif self._is_newline():
+                return self._newline_token()
             elif self._is_int():
                 return self._int_token()
             elif self._is_letter():
@@ -104,11 +107,23 @@ class Lexer:
         if self._current_char == self.EOF:
             return False
 
-        return re.match(r'^\s$', self._current_char) is not None
+        return re.match(r'^[^\S\r\n]$', self._current_char) is not None
 
     def _whitespace(self):
         while self._is_whitespace():
             self._consume()
+
+    def _is_newline(self) -> bool:
+        if self._current_char == self.EOF:
+            return False
+
+        return re.match(r'^[\r\n]$', self._current_char) is not None
+
+    def _newline_token(self) -> Token:
+        while self._is_newline():
+            self._consume()
+
+        return Token(TokenType.NEWLINE, '')
 
     def _is_int(self) -> bool:
         if self._current_char == self.EOF:
