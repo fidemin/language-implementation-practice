@@ -23,7 +23,11 @@ class TokenType(Enum):
     NOT = 23
     AND = 24
     OR = 25
-    SEMICOLON = 26
+
+    # others
+    SEMICOLON = 30
+    LPAREN = 31
+    RPAREN = 32
 
 
 @dataclass
@@ -71,12 +75,18 @@ class Lexer:
             elif self._current_char == ';':
                 self._consume()
                 return Token(TokenType.SEMICOLON, ';')
+            elif self._current_char == '(':
+                self._consume()
+                return Token(TokenType.LPAREN, '(')
+            elif self._current_char == ')':
+                self._consume()
+                return Token(TokenType.RPAREN, ')')
             elif self._is_whitespace():
                 self._whitespace()
             elif self._is_int():
                 return self._int_token()
             elif self._is_letter():
-                return self._var_token()
+                return self._letters_token()
             else:
                 raise LexerNextTokenException(f'invalid character at {self._p}: {self._current_char}')
         return Token(TokenType.EOF, '')
@@ -124,7 +134,7 @@ class Lexer:
 
         return re.match(r'^[a-zA-Z]$', self._current_char) is not None
 
-    def _var_token(self):
+    def _letters_token(self):
         # first character should be letter
         chars = [self._current_char]
         self._consume()

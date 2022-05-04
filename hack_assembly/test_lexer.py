@@ -60,6 +60,11 @@ class TestLexer:
                 Token(TokenType.PLUS, '+'),
                 Token(TokenType.PREDEFINED, 'SP'),
             ]),
+            ('(LOOP)', [
+                Token(TokenType.LPAREN, '('),
+                Token(TokenType.VAR, 'LOOP'),
+                Token(TokenType.RPAREN, ')'),
+            ]),
         ]
 
     @staticmethod
