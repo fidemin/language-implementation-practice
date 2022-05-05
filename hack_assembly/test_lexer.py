@@ -67,7 +67,8 @@ class TestLexer:
             ]),
             ('''
             (LOOP)
-             
+            // this is comment     
+            // good good
             D=R0+1
             ''', [
                 Token(TokenType.LPAREN, '('),

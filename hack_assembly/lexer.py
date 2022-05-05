@@ -90,6 +90,8 @@ class Lexer:
             elif self._current_char == ')':
                 self._consume()
                 return Token(TokenType.RPAREN, ')')
+            elif self._current_char == '/':
+                self._comment()
             elif self._is_whitespace():
                 if (token := self._whitespace()) is not None:
                     return token
@@ -133,6 +135,20 @@ class Lexer:
             return Token(TokenType.NEWLINE, '')
 
         return None
+
+    def _comment(self):
+        for _ in range(2):
+            if self._current_char != '/':
+                raise LexerNextTokenException(f'expected / but {self._current_char}')
+            self._consume()
+
+        while self._current_char != self.EOF:
+            # returning newline token after comment is redundant
+            # pass newline token if exists
+            if self._is_newline():
+                self._whitespace()
+                return
+            self._consume()
 
     def _is_int(self) -> bool:
         if self._current_char == self.EOF:
