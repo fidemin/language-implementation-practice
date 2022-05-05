@@ -65,7 +65,8 @@ class TestLexer:
                 Token(TokenType.VAR, 'LOOP'),
                 Token(TokenType.RPAREN, ')'),
             ]),
-            ('''
+            ('''// this is also comment
+            // first line comment
             (LOOP)
             // this is comment     
             // good good
@@ -88,6 +89,9 @@ class TestLexer:
     def _lexer_fail_test_cases() -> list[tuple]:
         return [
             ('@123abc', LexerNextTokenException),
+            ('abcdef//', LexerNextTokenException),
+            ('abcdef@', LexerNextTokenException),
+            ('/ hi', LexerNextTokenException),
         ]
 
     @pytest.mark.parametrize('input_text,expected', _lexer_success_test_cases())

@@ -4,9 +4,6 @@ from enum import Enum
 from typing import Optional
 
 
-#TODO: deal with comment
-
-
 class TokenType(Enum):
     # EOF
     EOF = -1
@@ -174,6 +171,12 @@ class Lexer:
 
         return re.match(r'^[a-zA-Z]$', self._current_char) is not None
 
+    def _is_banned_trailing_char(self) -> bool:
+        if self._current_char == self.EOF:
+            return False
+
+        return re.match(r'^[@/]$', self._current_char) is not None
+
     def _letters_token(self):
         # first character should be letter
         chars = [self._current_char]
@@ -182,6 +185,9 @@ class Lexer:
         while self._is_letter() or self._is_int():
             chars.append(self._current_char)
             self._consume()
+
+            if self._is_banned_trailing_char():
+                raise LexerNextTokenException(f'{self._current_char} is not proper for letters token')
 
         var_text = ''.join(chars)
 
