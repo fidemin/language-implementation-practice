@@ -1,6 +1,10 @@
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
+
+
+#TODO: deal with comment
 
 
 class TokenType(Enum):
@@ -50,6 +54,10 @@ class Lexer:
         self._p = -1
         self._consume()
 
+        # if newline exists in front, igonre it
+        if self._whitespace():
+            self._whitespace()
+
     def next_token(self) -> Token:
         while self._current_char != self.EOF:
             if self._current_char == '@':
@@ -83,9 +91,8 @@ class Lexer:
                 self._consume()
                 return Token(TokenType.RPAREN, ')')
             elif self._is_whitespace():
-                self._whitespace()
-            elif self._is_newline():
-                return self._newline_token()
+                if (token := self._whitespace()) is not None:
+                    return token
             elif self._is_int():
                 return self._int_token()
             elif self._is_letter():
@@ -107,11 +114,7 @@ class Lexer:
         if self._current_char == self.EOF:
             return False
 
-        return re.match(r'^[^\S\r\n]$', self._current_char) is not None
-
-    def _whitespace(self):
-        while self._is_whitespace():
-            self._consume()
+        return re.match(r'^\s$', self._current_char) is not None
 
     def _is_newline(self) -> bool:
         if self._current_char == self.EOF:
@@ -119,11 +122,17 @@ class Lexer:
 
         return re.match(r'^[\r\n]$', self._current_char) is not None
 
-    def _newline_token(self) -> Token:
-        while self._is_newline():
+    def _whitespace(self) -> Optional[Token]:
+        has_newline = False
+        while self._is_whitespace():
+            if self._is_newline():
+                has_newline = True
             self._consume()
 
-        return Token(TokenType.NEWLINE, '')
+        if has_newline:
+            return Token(TokenType.NEWLINE, '')
+
+        return None
 
     def _is_int(self) -> bool:
         if self._current_char == self.EOF:
