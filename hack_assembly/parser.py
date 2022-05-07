@@ -10,11 +10,19 @@ class MismatchException(Exception):
 class Parser:
     def __init__(self, lexer: Lexer):
         self._lexer = lexer
-        self._lookahead_token: Optional[Token] = None
+        self._lookahead_token: Token = Token(TokenType.EOF, '')
         self._consume()
 
     def _consume(self):
         self._lookahead_token = self._lexer.next_token()
+
+    def _match(self, token_type: TokenType):
+        if self._lookahead_token_type() != token_type:
+            raise MismatchException(f'expected: {token_type} but {self._lookahead_token.type}')
+        self._consume()
+
+    def _lookahead_token_type(self) -> TokenType:
+        return self._lookahead_token.type
 
     def _a_instruction(self):
         """
@@ -22,11 +30,11 @@ class Parser:
         :return:
         """
         self._match(TokenType.AT)
-        if self._lookahead_token == TokenType.VAR:
+        if self._lookahead_token_type() == TokenType.VAR:
             self._match(TokenType.VAR)
-        elif self._lookahead_token == TokenType.PREDEFINED:
-            self._match(TokenType.VAR)
-        elif self._lookahead_token == TokenType.INT:
+        elif self._lookahead_token_type() == TokenType.PREDEFINED:
+            self._match(TokenType.PREDEFINED)
+        elif self._lookahead_token_type() == TokenType.INT:
             self._match(TokenType.INT)
 
     def _c_instruction(self):
@@ -43,14 +51,15 @@ class Parser:
         dest: REG_ONE | REG_MULTI
         :return:
         """
-        if self._lookahead_token == TokenType.REG_ONE:
+        if self._lookahead_token_type() == TokenType.REG_ONE:
             self._match(TokenType.REG_ONE)
-        elif self._lookahead_token == TokenType.REG_MULTI:
+        elif self._lookahead_token_type() == TokenType.REG_MULTI:
             self._match(TokenType.REG_MULTI)
 
     def _comp(self):
         """
         comp: INT
+              | '-' (INT | REG_ONE)
 
         where INT in {0, 1}
         :return:
@@ -59,9 +68,5 @@ class Parser:
             self._match(TokenType.INT)
 
     def _is_zero_or_one_int_token(self):
-        return self._lookahead_token.type == TokenType.INT and self._lookahead_token.text in {'0', '1'}
+        return self._lookahead_token_type() == TokenType.INT and self._lookahead_token.text in {'0', '1'}
 
-    def _match(self, token_type: TokenType):
-        if self._lookahead_token.type != token_type:
-            raise MismatchException(f'expected: {token_type} but {self._lookahead_token.type}')
-        self._consume()
