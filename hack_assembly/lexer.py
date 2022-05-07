@@ -43,7 +43,7 @@ class LexerNextTokenException(Exception):
 
 
 class Lexer:
-    EOF = -1
+    EOF = ''
 
     def __init__(self, input_text: str):
         self._input_text = input_text
@@ -110,15 +110,9 @@ class Lexer:
         self._current_char = self._input_text[self._p]
 
     def _is_whitespace(self) -> bool:
-        if self._current_char == self.EOF:
-            return False
-
         return re.match(r'^\s$', self._current_char) is not None
 
     def _is_newline(self) -> bool:
-        if self._current_char == self.EOF:
-            return False
-
         return re.match(r'^[\r\n]$', self._current_char) is not None
 
     def _whitespace(self) -> Optional[Token]:
@@ -148,9 +142,6 @@ class Lexer:
             self._consume()
 
     def _is_int(self) -> bool:
-        if self._current_char == self.EOF:
-            return False
-
         # if current char is integer -> True
         return re.match(r'^\d$', self._current_char) is not None
 
@@ -166,15 +157,9 @@ class Lexer:
         return Token(TokenType.INT, ''.join(chars))
 
     def _is_letter(self) -> bool:
-        if self._current_char == self.EOF:
-            return False
-
         return re.match(r'^[a-zA-Z]$', self._current_char) is not None
 
     def _is_banned_trailing_char(self) -> bool:
-        if self._current_char == self.EOF:
-            return False
-
         return re.match(r'^[@/]$', self._current_char) is not None
 
     def _letters_token(self):
