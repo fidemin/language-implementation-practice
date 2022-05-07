@@ -7,6 +7,9 @@ class MismatchException(Exception):
 
 
 class Parser:
+    """
+    TODO: need to deal with 'M=A D' fail case
+    """
     def __init__(self, lexer: Lexer):
         self._lexer = lexer
         self._buffer_size = 2
@@ -47,11 +50,17 @@ class Parser:
     def _c_instruction(self):
         """
         c_instruction: dest '=' comp
+                     | comp ';' jump
         :return:
         """
-        self._dest()
-        self._match(TokenType.EQUAL)
-        self._comp()
+        if self._lookahead_token_type(1) == TokenType.EQUAL:
+            self._dest()
+            self._match(TokenType.EQUAL)
+            self._comp()
+        else:
+            self._comp()
+            self._match(TokenType.SEMICOLON)
+            self._jump()
 
     def _dest(self):
         """
@@ -107,6 +116,9 @@ class Parser:
                 self._match(TokenType.REG_ONE)
         else:
             raise MismatchException(f'comp parsing failed at {self._lookahead_token}')
+
+    def _jump(self):
+        self._match(TokenType.JUMP)
 
     def _is_zero_or_one_int_token(self):
         return self._lookahead_token_type(0) == TokenType.INT and self._lookahead_token(0).text in {'0', '1'}

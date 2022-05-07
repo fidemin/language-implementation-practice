@@ -39,12 +39,15 @@ class TestParser:
             'M=D|A',
 
             # comp;jump
-
+            '0;JMP',
+            'D;JGT',
+            'D&A;JGT',
         ]
 
     @staticmethod
     def _parser_c_instruction_fail_test_cases() -> list[str]:
         return [
+            # dest=comp fail cases
             'M=-0',
             'MD=2',
             'MD=i',
@@ -55,6 +58,10 @@ class TestParser:
             'M=D-0',
             'M=A&0',
             'M=D|1',
+            'M=JMP'
+
+            # comp;jump fail cases
+            'AMD;JMP',
         ]
 
     @pytest.mark.parametrize('input_text', _parser_a_instruction_success_test_cases())
