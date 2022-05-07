@@ -59,6 +59,11 @@ class Parser:
         """
         comp: INT{0, 1}
               | '-' (INT{1} | REG_ONE)
+              | REG_ONE
+              | REG_ONE '+' (REG_ONE | INT{1})
+              | REG_ONE '-' (REG_ONE | INT{1})
+              | REG_ONE '&' REG_ONE
+              | REG_ONE '|' REG_ONE
         :return:
         """
         if self._is_zero_or_one_int_token():
@@ -68,6 +73,29 @@ class Parser:
             if self._is_one_int_token():
                 self._match(TokenType.INT)
             else:
+                self._match(TokenType.REG_ONE)
+        elif self._lookahead_token_type() == TokenType.NOT:
+            self._match(TokenType.NOT)
+            self._match(TokenType.REG_ONE)
+        elif self._lookahead_token_type() == TokenType.REG_ONE:
+            self._match(TokenType.REG_ONE)
+            if self._lookahead_token_type() == TokenType.PLUS:
+                self._match(TokenType.PLUS)
+                if self._is_one_int_token():
+                    self._match(TokenType.INT)
+                else:
+                    self._match(TokenType.REG_ONE)
+            elif self._lookahead_token_type() == TokenType.MINUS:
+                self._match(TokenType.MINUS)
+                if self._is_one_int_token():
+                    self._match(TokenType.INT)
+                else:
+                    self._match(TokenType.REG_ONE)
+            elif self._lookahead_token_type() == TokenType.AND:
+                self._match(TokenType.AND)
+                self._match(TokenType.REG_ONE)
+            elif self._lookahead_token_type() == TokenType.OR:
+                self._match(TokenType.OR)
                 self._match(TokenType.REG_ONE)
         else:
             raise MismatchException(f'comp parsing failed at {self._lookahead_token}')

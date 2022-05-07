@@ -28,6 +28,15 @@ class TestParser:
             'M=1',
             'MD=1',
             'MD=-1',
+            'MD=!M',
+            'M=!A',
+            'M=D',
+            'M=A+D',
+            'M=D+1',
+            'M=A-D',
+            'M=D-1',
+            'M=A&D',
+            'M=D|A',
         ]
 
     @staticmethod
@@ -38,6 +47,11 @@ class TestParser:
             'MD=i',
             'MD=-2',
             'MD=AMD',
+            'MD=!1',
+            'M=D+0',
+            'M=D-0',
+            'M=A&0',
+            'M=D|1',
         ]
 
     @pytest.mark.parametrize('input_text', _parser_a_instruction_success_test_cases())
@@ -59,3 +73,9 @@ class TestParser:
         parser = Parser(lexer)
         parser._c_instruction()
 
+    @pytest.mark.parametrize('input_text', _parser_c_instruction_fail_test_cases())
+    def test_parser_c_instruction_fail(self, input_text):
+        lexer = Lexer(input_text)
+        parser = Parser(lexer)
+        with pytest.raises(MismatchException):
+            parser._c_instruction()
