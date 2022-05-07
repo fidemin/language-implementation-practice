@@ -17,7 +17,12 @@ class Parser:
 
     def _a_instruction(self):
         self._match(TokenType.AT)
-        self._match(TokenType.VAR)
+        if self._lookahead_token == TokenType.VAR:
+            self._match(TokenType.VAR)
+        elif self._lookahead_token == TokenType.PREDEFINED:
+            self._match(TokenType.VAR)
+        elif self._lookahead_token == TokenType.INT:
+            self._match(TokenType.INT)
 
     def _match(self, token_type: TokenType):
         if self._lookahead_token.type != token_type:

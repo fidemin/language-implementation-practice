@@ -9,9 +9,9 @@ class TestParser:
     def _parser_a_instruction_success_test_cases() -> list[str]:
         return [
             '@i',
-            #'@15',
-            #'@R0',
-            #'@SCREEN',
+            '@15',
+            '@R0',
+            '@SCREEN',
         ]
 
     @pytest.mark.parametrize('input_text', _parser_a_instruction_success_test_cases())
