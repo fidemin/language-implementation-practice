@@ -16,6 +16,10 @@ class Parser:
         self._lookahead_token = self._lexer.next_token()
 
     def _a_instruction(self):
+        """
+        a_instruction: '@' VAR | PREDEFINED | INT
+        :return:
+        """
         self._match(TokenType.AT)
         if self._lookahead_token == TokenType.VAR:
             self._match(TokenType.VAR)
