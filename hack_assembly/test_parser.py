@@ -37,6 +37,9 @@ class TestParser:
             'M=D-1',
             'M=A&D',
             'M=D|A',
+
+            # comp;jump
+
         ]
 
     @staticmethod
