@@ -10,7 +10,7 @@ class Parser:
     """
     TODO:
       - 'M=A D' fail case -> deal with multiline
-      - l construction case
+      - if symbol for l instruction is defined twice, where to deal with it
     """
     def __init__(self, lexer: Lexer):
         self._lexer = lexer
@@ -63,6 +63,17 @@ class Parser:
             self._comp()
             self._match(TokenType.SEMICOLON)
             self._jump()
+
+    def _l_instruction(self):
+        """
+        l_instruction: '(' VAR ')'
+
+        :return:
+        """
+
+        self._match(TokenType.LPAREN)
+        self._match(TokenType.VAR)
+        self._match(TokenType.RPAREN)
 
     def _dest(self):
         """
@@ -127,5 +138,3 @@ class Parser:
 
     def _is_one_int_token(self):
         return self._lookahead_token_type(0) == TokenType.INT and self._lookahead_token(0).text == '1'
-
-

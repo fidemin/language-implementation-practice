@@ -64,6 +64,22 @@ class TestParser:
             'AMD;JMP',
         ]
 
+    @staticmethod
+    def _parser_l_instruction_success_test_cases() -> list[str]:
+        return [
+            # (VAR)
+            '(i)',
+            '(abc)',
+            '(abc123)',
+        ]
+
+    @staticmethod
+    def _parser_l_instruction_fail_test_cases() -> list[str]:
+        return [
+            '(SCREEN)',
+            '(123)',
+        ]
+
     @pytest.mark.parametrize('input_text', _parser_a_instruction_success_test_cases())
     def test_parser_a_instruction_success(self, input_text):
         lexer = Lexer(input_text)
@@ -89,3 +105,17 @@ class TestParser:
         parser = Parser(lexer)
         with pytest.raises(MismatchException):
             parser._c_instruction()
+
+    @pytest.mark.parametrize('input_text', _parser_l_instruction_success_test_cases())
+    def test_parser_l_instruction_success(self, input_text):
+        lexer = Lexer(input_text)
+        parser = Parser(lexer)
+        parser._l_instruction()
+
+    @pytest.mark.parametrize('input_text', _parser_l_instruction_fail_test_cases())
+    def test_parser_l_instruction_fail(self, input_text):
+        lexer = Lexer(input_text)
+        parser = Parser(lexer)
+        with pytest.raises(MismatchException):
+            parser._l_instruction()
+
