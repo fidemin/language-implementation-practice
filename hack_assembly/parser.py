@@ -8,7 +8,9 @@ class MismatchException(Exception):
 
 class Parser:
     """
-    TODO: need to deal with 'M=A D' fail case
+    TODO:
+      - 'M=A D' fail case -> deal with multiline
+      - l construction case
     """
     def __init__(self, lexer: Lexer):
         self._lexer = lexer
