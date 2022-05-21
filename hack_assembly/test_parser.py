@@ -6,7 +6,7 @@ from .parser import Parser, MismatchException
 
 class TestParser:
     @staticmethod
-    def _parser_a_instruction_success_test_cases() -> list[str]:
+    def _a_instruction_success_test_cases() -> list[str]:
         return [
             '@i',  # VAR
             '@15',  # INT
@@ -14,14 +14,14 @@ class TestParser:
         ]
 
     @staticmethod
-    def _parser_a_instruction_fail_test_cases() -> list[str]:
+    def _a_instruction_fail_test_cases() -> list[str]:
         return [
             '@JGT',
             '@'
         ]
 
     @staticmethod
-    def _parser_c_instruction_success_test_cases() -> list[str]:
+    def _c_instruction_success_test_cases() -> list[str]:
         return [
             # dest=comp
             'M=0',
@@ -45,7 +45,7 @@ class TestParser:
         ]
 
     @staticmethod
-    def _parser_c_instruction_fail_test_cases() -> list[str]:
+    def _c_instruction_fail_test_cases() -> list[str]:
         return [
             # dest=comp fail cases
             'M=-0',
@@ -65,7 +65,7 @@ class TestParser:
         ]
 
     @staticmethod
-    def _parser_l_instruction_success_test_cases() -> list[str]:
+    def _l_instruction_success_test_cases() -> list[str]:
         return [
             # (VAR)
             '(i)',
@@ -74,46 +74,46 @@ class TestParser:
         ]
 
     @staticmethod
-    def _parser_l_instruction_fail_test_cases() -> list[str]:
+    def _l_instruction_fail_test_cases() -> list[str]:
         return [
             '(SCREEN)',
             '(123)',
         ]
 
-    @pytest.mark.parametrize('input_text', _parser_a_instruction_success_test_cases())
-    def test_parser_a_instruction_success(self, input_text):
+    @pytest.mark.parametrize('input_text', _a_instruction_success_test_cases())
+    def test_a_instruction_success(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         parser._a_instruction()
 
-    @pytest.mark.parametrize('input_text', _parser_a_instruction_fail_test_cases())
-    def test_parser_a_instruction_fail(self, input_text):
+    @pytest.mark.parametrize('input_text', _a_instruction_fail_test_cases())
+    def test_a_instruction_fail(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         with pytest.raises(MismatchException):
             parser._a_instruction()
 
-    @pytest.mark.parametrize('input_text', _parser_c_instruction_success_test_cases())
-    def test_parser_c_instruction_success(self, input_text):
+    @pytest.mark.parametrize('input_text', _c_instruction_success_test_cases())
+    def test_c_instruction_success(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         parser._c_instruction()
 
-    @pytest.mark.parametrize('input_text', _parser_c_instruction_fail_test_cases())
-    def test_parser_c_instruction_fail(self, input_text):
+    @pytest.mark.parametrize('input_text', _c_instruction_fail_test_cases())
+    def test_c_instruction_fail(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         with pytest.raises(MismatchException):
             parser._c_instruction()
 
-    @pytest.mark.parametrize('input_text', _parser_l_instruction_success_test_cases())
-    def test_parser_l_instruction_success(self, input_text):
+    @pytest.mark.parametrize('input_text', _l_instruction_success_test_cases())
+    def test_l_instruction_success(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         parser._l_instruction()
 
-    @pytest.mark.parametrize('input_text', _parser_l_instruction_fail_test_cases())
-    def test_parser_l_instruction_fail(self, input_text):
+    @pytest.mark.parametrize('input_text', _l_instruction_fail_test_cases())
+    def test_l_instruction_fail(self, input_text):
         lexer = Lexer(input_text)
         parser = Parser(lexer)
         with pytest.raises(MismatchException):
