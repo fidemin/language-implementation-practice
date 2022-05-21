@@ -80,6 +80,36 @@ class TestParser:
             '(123)',
         ]
 
+    @staticmethod
+    def _parse_success_test_cases() -> list[str]:
+        return [
+            '''
+// Adds 1 + ... + 100
+    @i
+    M=1  // i=1
+    @sum
+    M=0  // sum=0
+(LOOP)
+    @i
+    D=M  // D=i
+    @100
+    D=D-A  // D=i-100
+    @END
+    D;JGT  // if (i-100)>0 goto END
+    @i
+    D=M  // D=i
+    @sum
+    M=D+M  // sum=sum+1
+    @i
+    M=M+1 // i=i+1
+    @LOOP
+    0;JMP  // goto LOOP
+(END)
+    @END
+    0;JMP
+            '''
+        ]
+
     @pytest.mark.parametrize('input_text', _a_instruction_success_test_cases())
     def test_a_instruction_success(self, input_text):
         lexer = Lexer(input_text)
@@ -119,3 +149,8 @@ class TestParser:
         with pytest.raises(MismatchException):
             parser._l_instruction()
 
+    @pytest.mark.parametrize('input_text', _parse_success_test_cases())
+    def test_parse(self, input_text):
+        lexer = Lexer(input_text)
+        parser = Parser(lexer)
+        parser.parse()

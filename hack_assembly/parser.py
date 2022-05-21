@@ -21,6 +21,18 @@ class Parser:
         for _ in range(self._buffer_size):
             self._consume()
 
+    def parse(self):
+        while self._lookahead_token_type(0) != TokenType.EOF:
+            if self._lookahead_token_type(0) == TokenType.AT:
+                self._a_instruction()
+            elif self._lookahead_token_type(0) == TokenType.LPAREN:
+                self._l_instruction()
+            else:
+                self._c_instruction()
+
+            if self._lookahead_token_type(0) == TokenType.NEWLINE:
+                self._match(TokenType.NEWLINE)
+
     def _consume(self):
         self._lookahead_buffer[self._p] = self._lexer.next_token()
         self._p = (self._p + 1) % self._buffer_size
