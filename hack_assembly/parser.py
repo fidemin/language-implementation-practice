@@ -32,6 +32,9 @@ class Parser:
 
             if self._lookahead_token_type(0) == TokenType.NEWLINE:
                 self._match(TokenType.NEWLINE)
+            else:
+                self._match(TokenType.EOF)
+                break
 
     def _consume(self):
         self._lookahead_buffer[self._p] = self._lexer.next_token()

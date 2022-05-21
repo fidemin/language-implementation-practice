@@ -51,9 +51,9 @@ class Lexer:
         self._p = -1
         self._consume()
 
-        # if newline exists in front, igonre it
-        if self._whitespace():
-            self._whitespace()
+        # if newline or comment exists in front, ignore it
+        if self._is_whitespace_or_comment():
+            self._whitespace_or_comment()
 
     def next_token(self) -> Token:
         while self._current_char != self.EOF:
@@ -87,10 +87,8 @@ class Lexer:
             elif self._current_char == ')':
                 self._consume()
                 return Token(TokenType.RPAREN, ')')
-            elif self._current_char == '/':
-                self._comment()
-            elif self._is_whitespace():
-                if (token := self._whitespace()) is not None:
+            elif self._is_whitespace_or_comment():
+                if (token := self._whitespace_or_comment()) is not None:
                     return token
             elif self._is_int():
                 return self._int_token()
@@ -115,6 +113,28 @@ class Lexer:
     def _is_newline(self) -> bool:
         return re.match(r'^[\r\n]$', self._current_char) is not None
 
+    def _is_comment(self) -> bool:
+        return self._current_char == '/'
+
+    def _is_whitespace_or_comment(self):
+        return self._is_whitespace() or self._is_comment()
+
+    def _whitespace_or_comment(self):
+        token = None
+        while self._is_whitespace_or_comment():
+            if self._is_whitespace():
+                if (temp := self._whitespace()) is not None:
+                    token = temp
+            else:
+                self._comment()
+
+        # For EOF, newline has no meaning
+        if self._current_char == self.EOF:
+            return None
+
+        # if newlines exists, only one token is returned
+        return token
+
     def _whitespace(self) -> Optional[Token]:
         has_newline = False
         while self._is_whitespace():
@@ -134,10 +154,8 @@ class Lexer:
             self._consume()
 
         while self._current_char != self.EOF:
-            # returning newline token after comment is redundant
-            # pass newline token if exists
+            # end of comment with newline
             if self._is_newline():
-                self._whitespace()
                 return
             self._consume()
 
