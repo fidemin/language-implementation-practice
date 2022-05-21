@@ -206,7 +206,7 @@ class TestLexer:
         ]
 
     @pytest.mark.parametrize('input_text,expected', _lexer_success_test_cases())
-    def test_next_token_success(self, input_text, expected):
+    def test_next_token_success(self, input_text: str, expected: list[Token]):
         lexer = Lexer(input_text)
         results = []
         while (token := lexer.next_token()).type != TokenType.EOF:
@@ -215,7 +215,7 @@ class TestLexer:
         assert results == expected
 
     @pytest.mark.parametrize('input_text,expected_exception', _lexer_fail_test_cases())
-    def test_next_token_fail(self, input_text, expected_exception):
+    def test_next_token_fail(self, input_text: str, expected_exception):
         with pytest.raises(expected_exception):
             lexer = Lexer(input_text)
             while lexer.next_token().type != TokenType.EOF:
