@@ -9,7 +9,6 @@ class MismatchException(Exception):
 class Parser:
     """
     TODO:
-      - 'M=A D' fail case -> deal with multiline
       - if symbol for l instruction is defined twice, where to deal with it
     """
     def __init__(self, lexer: Lexer):
