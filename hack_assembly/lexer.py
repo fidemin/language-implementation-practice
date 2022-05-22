@@ -120,11 +120,12 @@ class Lexer:
         return self._is_whitespace() or self._is_comment()
 
     def _whitespace_or_comment(self):
-        token = None
+        newline_token = None
         while self._is_whitespace_or_comment():
             if self._is_whitespace():
                 if (temp := self._whitespace()) is not None:
-                    token = temp
+                    # If multiple newlines exist, only one newline token is returned
+                    newline_token = temp
             else:
                 self._comment()
 
@@ -132,8 +133,7 @@ class Lexer:
         if self._current_char == self.EOF:
             return None
 
-        # if newlines exists, only one token is returned
-        return token
+        return newline_token
 
     def _whitespace(self) -> Optional[Token]:
         has_newline = False
